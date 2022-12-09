@@ -1,0 +1,17 @@
+### Home
+GET localhost:8080/
+
+### Wrong URL
+GET localhost:8080/GaRb4g3
+
+### Get all countries through PostgreSQL
+GET localhost:8080/pg/countries
+
+### Get all countries through PostgreSQL
+GET localhost:8080/pg/countries/
+
+### Get France through PostgreSQL
+GET localhost:8080/pg/countries/France
+
+### Wrong country
+GET localhost:8080/pg/countries/NonExistentCountry
