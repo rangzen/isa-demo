@@ -22,12 +22,12 @@ func main() {
 	pgConn := generatePgConnData()
 	pgDb, err := sql.Open("postgres", pgConn)
 	if err != nil {
-		log.Fatalf("error opening PostgreSQL connection: %v", err)
+		log.Fatalf("opening PostgreSQL connection: %v", err)
 	}
 	defer func(pgDb *sql.DB) {
 		err := pgDb.Close()
 		if err != nil {
-			log.Fatalf("error closing the PostgreSQL database: %v", err)
+			log.Fatalf("closing the PostgreSQL database: %v", err)
 		}
 	}(pgDb)
 
@@ -71,7 +71,7 @@ func main() {
 func loadEnvVar() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("error loading .env file")
+		log.Fatal("loading .env file")
 	}
 }
 

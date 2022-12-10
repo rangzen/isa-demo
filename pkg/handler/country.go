@@ -29,13 +29,13 @@ func (c *Country) Uni() func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			_, err = w.Write([]byte(err.Error()))
 			if err != nil {
-				log.Fatalf("error writing the Country Uni page: %v", err)
+				log.Fatalf("writing the Country Uni page: %v", err)
 			}
 			return
 		}
 		_, err = w.Write([]byte(get))
 		if err != nil {
-			log.Fatalf("error writing the Country Uni page: %v", err)
+			log.Fatalf("writing the Country Uni page: %v", err)
 		}
 	}
 }
@@ -47,13 +47,13 @@ func (c *Country) All() func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			_, err = w.Write([]byte(err.Error()))
 			if err != nil {
-				log.Fatalf("error writing the Country All page: %v", err)
+				log.Fatalf("writing the Country All page: %v", err)
 			}
 			return
 		}
 		_, err = w.Write([]byte(getAll))
 		if err != nil {
-			log.Fatalf("error writing the Country All page: %v", err)
+			log.Fatalf("writing the Country All page: %v", err)
 		}
 	}
 }
