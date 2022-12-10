@@ -2,6 +2,16 @@
 
 Yes, it is a geek joke: [ISA](https://en.wikipedia.org/wiki/Industry_Standard_Architecture).
 
+## Points of interest
+
+* No preemptive interface (e.g., [CountryRepository in country.go](pkg/handler/country.go)).
+* Tests from external package (e.g., [country_test.go](pkg/handler/country_test.go)).
+* Docker for gqlgen [gqlgen.Dockerfile](gqlgen.Dockerfile).
+* Docker-compose for the whole stack [docker-compose.yml](docker-compose.yml).
+* [/docs](docs)
+  * [api.http](docs/api.http) for IntelliJ REST Client.
+* `.env` file for configuration.
+
 ## Target
 
 ### SQL
