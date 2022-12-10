@@ -36,15 +36,15 @@ func main() {
 
 	// Apollo
 	apolloUrl := fmt.Sprintf("http://%s:%s%s", os.Getenv("APOLLO_HOST"), os.Getenv("APOLLO_PORT"), os.Getenv("APOLLO_PATH"))
-	apolloQuery := "{\"query\": \"query { topProducts {name price}}\"}"
-	apolloRepo := graphql.NewRepository(apolloUrl, apolloQuery)
-	apolloHandler := handler.NewProduct(apolloRepo)
+	apolloRtr := graphql.NewRouter(apolloUrl)
+	apolloEndPoint := handler.NewGraphQLEndpoint(apolloRtr)
+	productQuery := "{\"query\": \"query { topProducts {name price}}\"}"
 
 	// gqlgen
 	gqlUrl := fmt.Sprintf("http://%s:%s%s", os.Getenv("GQLGEN_HOST"), os.Getenv("GQLGEN_PORT"), os.Getenv("GQLGEN_PATH"))
-	gqlQuery := "{\"query\": \"query findTodos {todos {text done user {name}}}\"}"
-	gqlRepo := graphql.NewRepository(gqlUrl, gqlQuery)
-	gqlHandler := handler.NewTodo(gqlRepo)
+	gqlRtr := graphql.NewRouter(gqlUrl)
+	gqlEndPoint := handler.NewGraphQLEndpoint(gqlRtr)
+	todoQuery := "{\"query\": \"query findTodos {todos {text done user {name}}}\"}"
 
 	// Router
 	r := mux.NewRouter()
@@ -52,8 +52,8 @@ func main() {
 	r.HandleFunc("/pg/countries", pgCountryHandler.All())
 	r.HandleFunc("/pg/countries/", pgCountryHandler.All())
 	r.HandleFunc("/pg/countries/{country}", pgCountryHandler.Uni())
-	r.HandleFunc("/apollo/products", apolloHandler.Query())
-	r.HandleFunc("/gql/todos", gqlHandler.Query())
+	r.HandleFunc("/apollo/products", apolloEndPoint.Handler(productQuery))
+	r.HandleFunc("/gql/todos", gqlEndPoint.Handler(todoQuery))
 	http.Handle("/", r)
 
 	// Server
