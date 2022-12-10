@@ -15,8 +15,8 @@ Using Jet to get info with a join between two tables.
 
 Using gqlgen to access to a view of a data table.
 
-* [ ] [Apollo](https://www.apollographql.com/)
-* [ ] [gglgen](https://gqlgen.com/)
+* [x] [Apollo](https://www.apollographql.com/)
+* [x] [gglgen](https://gqlgen.com/)
 
 ### Redis
 
