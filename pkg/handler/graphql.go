@@ -24,7 +24,7 @@ func (e *GraphQLEndpoint) Handler(query string) func(w http.ResponseWriter, r *h
 	return func(w http.ResponseWriter, r *http.Request) {
 		get, err := e.router.Post(query)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte(fmt.Errorf("querying the GraphQL endpoint: %w", err).Error()))
 			if err != nil {
 				log.Fatalf("writing the GraphQL result: %v", err)

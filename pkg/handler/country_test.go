@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"database/sql"
 	"fmt"
 	h "github.com/rangzen/isa-demo/pkg/handler"
 	"net/http"
@@ -18,14 +19,36 @@ func (c CountryRepositoryError) GetAll() (string, error) {
 	return "", fmt.Errorf("something went wrong")
 }
 
-func TestCountry_Uni(t *testing.T) {
-	errRep := h.NewCountry(CountryRepositoryError{})
+type CountryRepositoryNoRows struct{}
 
-	t.Run("when repository error, then send back a 404", func(t *testing.T) {
+func (c CountryRepositoryNoRows) Get(_ string) (string, error) {
+	return "", sql.ErrNoRows
+}
+
+func (c CountryRepositoryNoRows) GetAll() (string, error) {
+	return "", sql.ErrNoRows
+}
+
+func TestCountry_Uni(t *testing.T) {
+
+	t.Run("when repository error, then send back a 500", func(t *testing.T) {
+		repError := h.NewCountry(CountryRepositoryError{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/country/england", nil)
 
-		errRep.Uni()(w, r)
+		repError.Uni()(w, r)
+
+		if w.Code != http.StatusInternalServerError {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
+		}
+	})
+
+	t.Run("when repository no rows, then send back a 404", func(t *testing.T) {
+		repNoRows := h.NewCountry(CountryRepositoryNoRows{})
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodGet, "/country/england", nil)
+
+		repNoRows.Uni()(w, r)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
@@ -34,13 +57,25 @@ func TestCountry_Uni(t *testing.T) {
 }
 
 func TestCountry_All(t *testing.T) {
-	errRep := h.NewCountry(CountryRepositoryError{})
 
-	t.Run("when repository error, then send back a 404", func(t *testing.T) {
+	t.Run("when repository error, then send back a 500", func(t *testing.T) {
+		repError := h.NewCountry(CountryRepositoryError{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/country", nil)
 
-		errRep.All()(w, r)
+		repError.All()(w, r)
+
+		if w.Code != http.StatusInternalServerError {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
+		}
+	})
+
+	t.Run("when repository no rows, then send back a 404", func(t *testing.T) {
+		repNoRows := h.NewCountry(CountryRepositoryNoRows{})
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodGet, "/country", nil)
+
+		repNoRows.All()(w, r)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)

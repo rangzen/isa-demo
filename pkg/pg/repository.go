@@ -3,7 +3,10 @@ package pg
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
+	"fmt"
 	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/qrm"
 	. "github.com/rangzen/isa-demo/.gen/postgres/public/table"
 )
 
@@ -34,14 +37,19 @@ func (r Repository) Get(country string) (string, error) {
 	)
 
 	var dest Answer
-	err := stmt.Query(r.db, &dest)
-	if err != nil {
-		return "", err
+
+	if err := stmt.Query(r.db, &dest); err != nil {
+		switch {
+		case errors.Is(err, qrm.ErrNoRows):
+			return "", sql.ErrNoRows
+		default:
+			return "", fmt.Errorf("querying the database: %w", err)
+		}
 	}
 
 	jsonTxt, err := json.MarshalIndent(dest, "", "  ")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("marshalling the JSON: %w", err)
 	}
 
 	return string(jsonTxt), nil
@@ -59,14 +67,19 @@ func (r Repository) GetAll() (string, error) {
 	)
 
 	var dest []Answer
-	err := stmt.Query(r.db, &dest)
-	if err != nil {
-		return "", err
+
+	if err := stmt.Query(r.db, &dest); err != nil {
+		switch {
+		case errors.Is(err, qrm.ErrNoRows):
+			return "", sql.ErrNoRows
+		default:
+			return "", fmt.Errorf("querying the database: %w", err)
+		}
 	}
 
 	jsonTxt, err := json.MarshalIndent(dest, "", "  ")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("marshalling the JSON: %w", err)
 	}
 
 	return string(jsonTxt), nil
