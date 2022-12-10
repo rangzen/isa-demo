@@ -9,3 +9,25 @@ services:
       - "5432:5432"
     env_file:
       - .env
+  appolographql:
+    image: ghcr.io/apollographql/router:v1.5.0
+    volumes:
+      - ./local/db/appolo/:/dist/local/
+    ports:
+      - "4000:4000"
+    env_file:
+        - .env
+    command:
+      [
+        "-s",
+        "/dist/local/supergraph-schema.graphql",
+        "--dev",
+      ]
+  gqlgen:
+    build:
+      context: .
+      dockerfile: gqlgen.Dockerfile
+    ports:
+      - "8099:8099"
+    env_file:
+        - .env

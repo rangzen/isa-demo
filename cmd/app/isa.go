@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/rangzen/isa-demo/pkg/graphql"
 	"github.com/rangzen/isa-demo/pkg/handler"
 	"github.com/rangzen/isa-demo/pkg/pg"
 	"log"
@@ -33,11 +34,26 @@ func main() {
 	pgRepo := pg.NewRepository(pgDb)
 	pgCountryHandler := handler.NewCountry(pgRepo)
 
+	// Apollo
+	apolloUrl := fmt.Sprintf("http://%s:%s%s", os.Getenv("APOLLO_HOST"), os.Getenv("APOLLO_PORT"), os.Getenv("APOLLO_PATH"))
+	apolloQuery := "{\"query\": \"query { topProducts {name price}}\"}"
+	apolloRepo := graphql.NewRepository(apolloUrl, apolloQuery)
+	apolloHandler := handler.NewProduct(apolloRepo)
+
+	// gqlgen
+	gqlUrl := fmt.Sprintf("http://%s:%s%s", os.Getenv("GQLGEN_HOST"), os.Getenv("GQLGEN_PORT"), os.Getenv("GQLGEN_PATH"))
+	gqlQuery := "{\"query\": \"query findTodos {todos {text done user {name}}}\"}"
+	gqlRepo := graphql.NewRepository(gqlUrl, gqlQuery)
+	gqlHandler := handler.NewTodo(gqlRepo)
+
 	// Router
 	r := mux.NewRouter()
 	r.HandleFunc("/", handler.Home)
 	r.HandleFunc("/pg/countries", pgCountryHandler.All())
+	r.HandleFunc("/pg/countries/", pgCountryHandler.All())
 	r.HandleFunc("/pg/countries/{country}", pgCountryHandler.Uni())
+	r.HandleFunc("/apollo/products", apolloHandler.Query())
+	r.HandleFunc("/gql/todos", gqlHandler.Query())
 	http.Handle("/", r)
 
 	// Server

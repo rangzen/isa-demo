@@ -15,3 +15,17 @@ GET localhost:8080/pg/countries/France
 
 ### Wrong country
 GET localhost:8080/pg/countries/NonExistentCountry
+
+### Producs through Apollo
+GET localhost:8080/apollo/products
+
+### Create a TODO through gqlgen
+POST http://0.0.0.0:8099/query
+Content-Type: application/json
+
+{
+  "query": "mutation createTodo { createTodo(input: {text: \"todo\", userId: \"1\"}) { user { id } text done }}"
+}
+
+### TODOs through gqlgen
+GET localhost:8080/gql/todos
