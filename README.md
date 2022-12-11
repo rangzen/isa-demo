@@ -2,6 +2,10 @@
 
 Yes, it is a geek joke: [ISA](https://en.wikipedia.org/wiki/Industry_Standard_Architecture).
 
+## General
+
+Backend with PostgreSQL, Apollo Server and gqlgen.
+
 ## Points of interest
 
 * No preemptive interface (e.g., [CountryRepository in country.go](pkg/handler/country.go)).
