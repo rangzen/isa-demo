@@ -10,6 +10,7 @@ Backend with PostgreSQL, Apollo Server and gqlgen.
 
 * No preemptive interface (e.g., [CountryRepository in country.go](pkg/handler/country.go)).
 * Tests from external package (e.g., [country_test.go](pkg/handler/country_test.go)).
+* Middleware for HTTP Handler (e.g., [logs/handler](pkg/logs/handler.go))
 * Docker for gqlgen [gqlgen.Dockerfile](gqlgen.Dockerfile).
 * Docker-compose for the whole stack [docker-compose.yml](docker-compose.yml).
 * [/docs](docs)
@@ -34,9 +35,9 @@ Using Apollo and gqlgen to access to a view of their data tables.
 
 ### Redis
 
-Cache with automatic ttl some results.
+Implement a pub/sub channel for logs.
 
-* [ ] [Redis](https://redis.io/)
+* [x] [Redis](https://redis.io/)
 
 ### Heroku
 

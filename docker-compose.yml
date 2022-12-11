@@ -31,3 +31,9 @@ services:
       - "8099:8099"
     env_file:
         - .env
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    env_file:
+        - .env

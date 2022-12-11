@@ -3,12 +3,15 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/rangzen/isa-demo/pkg/graphql"
 	"github.com/rangzen/isa-demo/pkg/handler"
+	"github.com/rangzen/isa-demo/pkg/logs"
 	"github.com/rangzen/isa-demo/pkg/pg"
+	"github.com/rangzen/isa-demo/pkg/subscriber"
 	"log"
 	"net/http"
 	"os"
@@ -46,13 +49,37 @@ func main() {
 	gqlEndPoint := handler.NewGraphQLEndpoint(gqlRtr)
 	todoQuery := "{\"query\": \"query findTodos {todos {text done user {name}}}\"}"
 
+	// RedisPublish
+	redisAddr := fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		Password: "",
+		DB:       0,
+	})
+	if _, e := redisClient.Ping(redisClient.Context()).Result(); e != nil {
+		log.Fatalf("pinging RedisPublish: %v", err)
+	}
+
+	// RedisPublish Publisher
+	logRedisPublish := logs.NewRedisPublish(redisClient, os.Getenv("REDIS_LOG_CHANNEL"))
+
+	// RedisPublish RedisSubscriber
+	redisSubscribe := subscriber.NewRedisSubscriber(redisClient, os.Getenv("REDIS_LOG_CHANNEL"))
+	go func() {
+		if e := redisSubscribe.Subscribe(logs.Stdout); e != nil {
+			log.Fatalf("subscribing to Redis Publisher: %v", err)
+		}
+	}()
+
 	// Router
 	r := mux.NewRouter()
 	r.HandleFunc("/", handler.Home)
-	r.HandleFunc("/pg/countries", pgCountryHandler.All())
+	// Middleware to logs to stdout
+	r.HandleFunc("/pg/countries", logs.Handler(pgCountryHandler.All(), logs.Stdout))
 	r.HandleFunc("/pg/countries/", pgCountryHandler.All())
 	r.HandleFunc("/pg/countries/{country}", pgCountryHandler.Uni())
-	r.HandleFunc("/apollo/products", apolloEndPoint.Handler(productQuery))
+	// Middleware to logs to a RedisPublish publisher
+	r.HandleFunc("/apollo/products", logs.Handler(apolloEndPoint.Handler(productQuery), logRedisPublish.Log))
 	r.HandleFunc("/gql/todos", gqlEndPoint.Handler(todoQuery))
 	http.Handle("/", r)
 
