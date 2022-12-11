@@ -27,7 +27,7 @@ Using Jet to get info with a join between two tables.
 
 ### GraphQL
 
-Using gqlgen to access to a view of a data table.
+Using Apollo and gqlgen to access to a view of their data tables.
 
 * [x] [Apollo](https://www.apollographql.com/)
 * [x] [gglgen](https://gqlgen.com/)
